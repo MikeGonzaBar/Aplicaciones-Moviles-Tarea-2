@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 enum QualityOfService { amazing, good, okay }
 
@@ -11,9 +10,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  QualityOfService? _character = QualityOfService.amazing;
-  double tip = 10.5;
-  bool isSwitched = false;
+  var _costOfService = TextEditingController();
+  QualityOfService? _quality = QualityOfService.amazing;
+  double _tip = 10.5;
+  bool _isSwitched = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,15 +30,12 @@ class _HomePageState extends State<HomePage> {
               title: Padding(
                 padding: const EdgeInsets.only(right: 24),
                 child: TextField(
-                  obscureText: true,
+                  controller: _costOfService,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Cost of Service',
                   ),
                   keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
                 ),
               ),
             ),
@@ -72,16 +69,15 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.green[900],
                   ),
                 ),
-                Text("Round up tip?"),
+                const Text("Round up tip?"),
                 Expanded(
                   child: Container(),
                 ),
                 Switch(
-                  value: isSwitched,
+                  value: _isSwitched,
                   onChanged: (value) {
                     setState(() {
-                      isSwitched = value;
-                      print(isSwitched);
+                      _isSwitched = value;
                     });
                   },
                 ),
@@ -90,12 +86,12 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
-                onPressed: () {},
+                onPressed: _getTipQtty,
                 color: Colors.green[900],
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5), // <-- Radius
                 ),
-                child: Text(
+                child: const Text(
                   "CALCULATE",
                   style: TextStyle(color: Colors.white),
                 ),
@@ -104,7 +100,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Tip Amount is: \$${tip}",
+                "Tip Amount is: \$$_tip",
                 style: TextStyle(color: Colors.grey[700], fontSize: 15),
                 textAlign: TextAlign.right,
               ),
@@ -113,15 +109,27 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
+  void _getTipQtty() {
+    double cost = double.parse(_costOfService.text);
+    double tipPercent = _quality == QualityOfService.amazing
+        ? 20
+        : _quality == QualityOfService.good
+            ? 18
+            : 15;
+    tipPercent = tipPercent / 100.0;
+    _tip = _isSwitched ? (cost * tipPercent).ceilToDouble() : cost * tipPercent;
+    setState(() {});
+  }
+
   RadioListTile<QualityOfService> qualityRadioBtn(
       String title, QualityOfService qosvalue) {
     return RadioListTile<QualityOfService>(
       title: Text(title),
       value: qosvalue,
-      groupValue: _character,
+      groupValue: _quality,
       onChanged: (QualityOfService? value) {
         setState(() {
-          _character = value;
+          _quality = value;
         });
       },
     );
