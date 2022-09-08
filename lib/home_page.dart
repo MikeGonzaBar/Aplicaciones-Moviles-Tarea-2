@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   var _costOfService = TextEditingController();
   QualityOfService? _quality = QualityOfService.amazing;
-  double _tip = 10.5;
+  double _tip = 0.0;
   bool _isSwitched = false;
   @override
   Widget build(BuildContext context) {
